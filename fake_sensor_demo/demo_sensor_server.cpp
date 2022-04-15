@@ -217,4 +217,4 @@ int main(int argc, char *argv[]) {
 	delete fastCGIHandler;
 	
 	return 0;
-}
+};

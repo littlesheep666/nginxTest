@@ -68,7 +68,7 @@ public:
         if (!cap.isOpened()) {
             std::cout << "Cannot open camera\n";
         }
-		t += 0.1;
+        t += 0.1;
 
         while (true) {
             i++;
@@ -87,7 +87,7 @@ public:
             }
         }
 
-
+    }
 
 private:
 	SensorCallback* sensorCallback = nullptr;
