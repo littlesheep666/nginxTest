@@ -150,7 +150,7 @@ public:
 	 **/
 	virtual void postString(std::string postArg) {
 		auto m = JSONCGIHandler::postDecoder(postArg);
-		float temp = atof(m["temperature"].c_str());
+        cv::Mat temp = atof(m["temperature"].c_str());
 		std::cerr << m["hello"] << "\n";
 		sensorfastcgi->forceTemperature(temp);
 	}
