@@ -132,7 +132,7 @@ public:
         jsonGenerator.add("time",sensorfastcgi->timeBuffer);
 
 
-        cv::Mat image = cv::imread("/Users/littlesheep/Downloads/test1_result.jpg");  //存放自己图像的路径
+        cv::Mat image = cv::imread("../test1_result.jpg" );  //存放自己图像的路径
         //imshow("显示图像", image);
         std::vector<unsigned char> data_encode;
         int res = imencode(".jpg", image, data_encode);
