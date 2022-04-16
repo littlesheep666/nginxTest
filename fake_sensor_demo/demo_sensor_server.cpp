@@ -23,10 +23,10 @@ int mainRunning = 1;
  * Handler when the user has pressed ctrl-C
  * send HUP via the kill command.
  **/
-void sigHandler(int sig) { 
-	if((sig == SIGHUP) || (sig == SIGINT)) {
-		mainRunning = 0;
-	}
+void sigHandler(int sig) {
+    if((sig == SIGHUP) || (sig == SIGINT)) {
+        mainRunning = 0;
+    }
 }
 
 
@@ -36,17 +36,17 @@ void sigHandler(int sig) {
  * kill -HUP <PID>
  **/
 void setHUPHandler() {
-	struct sigaction act;
-	memset (&act, 0, sizeof (act));
-	act.sa_handler = sigHandler;
-	if (sigaction (SIGHUP, &act, NULL) < 0) {
-		perror ("sigaction");
-		exit (-1);
-	}
-	if (sigaction (SIGINT, &act, NULL) < 0) {
-		perror ("sigaction");
-		exit (-1);
-	}
+    struct sigaction act;
+    memset (&act, 0, sizeof (act));
+    act.sa_handler = sigHandler;
+    if (sigaction (SIGHUP, &act, NULL) < 0) {
+        perror ("sigaction");
+        exit (-1);
+    }
+    if (sigaction (SIGINT, &act, NULL) < 0) {
+        perror ("sigaction");
+        exit (-1);
+    }
 }
 
 
@@ -58,40 +58,40 @@ void setHUPHandler() {
  **/
 class SENSORfastcgicallback : public SensorCallback {
 public:
-	std::deque<cv::Mat> temperatureBuffer;
-	std::deque<long> timeBuffer;
-	long t;
-	const int maxBufSize = 50;
+    std::deque<float> temperatureBuffer;
+    std::deque<long> timeBuffer;
+    long t;
+    const int maxBufSize = 50;
 
-	/**
-	 * Callback with the fresh ADC data.
-	 * That's where all the internal processing
-	 * of the data is happening. Here, we just
-	 * convert the raw ADC data to temperature
-	 * and store it in a variable.
-	 **/
-	virtual void hasSample(cv::Mat v) {
-		temperatureBuffer.push_back(v);
-		if (temperatureBuffer.size() > maxBufSize) temperatureBuffer.pop_front();
-		// timestamp
-		t = getTimeMS();
-		timeBuffer.push_back(t);
-		if (timeBuffer.size() > maxBufSize) timeBuffer.pop_front();
-	}
+    /**
+     * Callback with the fresh ADC data.
+     * That's where all the internal processing
+     * of the data is happening. Here, we just
+     * convert the raw ADC data to temperature
+     * and store it in a variable.
+     **/
+    virtual void hasSample(int v) {
+        temperatureBuffer.push_back(v);
+        if (temperatureBuffer.size() > maxBufSize) temperatureBuffer.pop_front();
+        // timestamp
+        t = getTimeMS();
+        timeBuffer.push_back(t);
+        if (timeBuffer.size() > maxBufSize) timeBuffer.pop_front();
+    }
 
-	void forceTemperature(cv::Mat temp) {
-		for(auto& v:temperatureBuffer) {
-			v = temp;
-		}
-	}
+    void forceTemperature(float temp) {
+        for(auto& v:temperatureBuffer) {
+            v = temp;
+        }
+    }
 
 private:
-	static unsigned long getTimeMS() {
-                std::chrono::time_point<std::chrono::system_clock> now = 
-                        std::chrono::system_clock::now();
-                auto duration = now.time_since_epoch();
-                return (unsigned long)std::chrono::duration_cast<std::chrono::milliseconds>(duration).count();
-        }
+    static unsigned long getTimeMS() {
+        std::chrono::time_point<std::chrono::system_clock> now =
+                std::chrono::system_clock::now();
+        auto duration = now.time_since_epoch();
+        return (unsigned long)std::chrono::duration_cast<std::chrono::milliseconds>(duration).count();
+    }
 };
 
 
@@ -103,35 +103,44 @@ private:
  **/
 class JSONCGIADCCallback : public JSONCGIHandler::GETCallback {
 private:
-	/**
-	 * Pointer to the ADC event handler because it keeps
-	 * the data in this case. In a proper application
-	 * that would be probably a database class or a
-	 * controller keeping it all together.
-	 **/
-	SENSORfastcgicallback* sensorfastcgi;
+    /**
+     * Pointer to the ADC event handler because it keeps
+     * the data in this case. In a proper application
+     * that would be probably a database class or a
+     * controller keeping it all together.
+     **/
+    SENSORfastcgicallback* sensorfastcgi;
 
 public:
-	/**
-	 * Constructor: argument is the ADC callback handler
-	 * which keeps the data as a simple example.
-	 **/
-	JSONCGIADCCallback(SENSORfastcgicallback* argSENSORfastcgi) {
-		sensorfastcgi = argSENSORfastcgi;
-	}
+    /**
+     * Constructor: argument is the ADC callback handler
+     * which keeps the data as a simple example.
+     **/
+    JSONCGIADCCallback(SENSORfastcgicallback* argSENSORfastcgi) {
+        sensorfastcgi = argSENSORfastcgi;
+    }
 
-	/**
-	 * Gets the data sends it to the webserver.
-	 * The callback creates two json entries. One with the
-	 * timestamp and one with the temperature from the sensor.
-	 **/
-	virtual std::string getJSONString() {
-		JSONCGIHandler::JSONGenerator jsonGenerator;
-		jsonGenerator.add("epoch",(long)time(NULL));
-		jsonGenerator.add("temperature",sensorfastcgi->temperatureBuffer);
-		jsonGenerator.add("time",sensorfastcgi->timeBuffer);
-		return jsonGenerator.getJSON();
-	}
+    /**
+     * Gets the data sends it to the webserver.
+     * The callback creates two json entries. One with the
+     * timestamp and one with the temperature from the sensor.
+     **/
+    virtual std::string getJSONString() {
+        JSONCGIHandler::JSONGenerator jsonGenerator;
+        jsonGenerator.add("epoch",(long)time(NULL));
+        jsonGenerator.add("temperature",sensorfastcgi->temperatureBuffer);
+        jsonGenerator.add("time",sensorfastcgi->timeBuffer);
+
+
+        cv::Mat image = cv::imread("/Users/littlesheep/Downloads/test1_result.jpg");  //存放自己图像的路径
+        //imshow("显示图像", image);
+        std::vector<unsigned char> data_encode;
+        int res = imencode(".jpg", image, data_encode);
+        std::string str_encode(data_encode.begin(), data_encode.end());
+        const char* c = str_encode.c_str();
+        jsonGenerator.add("mat",base64_encode(c, str_encode.size()));
+        return jsonGenerator.getJSON();
+    }
 };
 
 
@@ -140,81 +149,81 @@ public:
  **/
 class SENSORPOSTCallback : public JSONCGIHandler::POSTCallback {
 public:
-	SENSORPOSTCallback(SENSORfastcgicallback* argSENSORfastcgi) {
-		sensorfastcgi = argSENSORfastcgi;
-	}
+    SENSORPOSTCallback(SENSORfastcgicallback* argSENSORfastcgi) {
+        sensorfastcgi = argSENSORfastcgi;
+    }
 
-	/**
-	 * As a crude example we force the temperature readings
-	 * to be 20 degrees for a certain number of timesteps.
-	 **/
-	virtual void postString(std::string postArg) {
-		auto m = JSONCGIHandler::postDecoder(postArg);
-        cv::Mat temp = atof(m["temperature"].c_str());
-		std::cerr << m["hello"] << "\n";
-		sensorfastcgi->forceTemperature(temp);
-	}
+    /**
+     * As a crude example we force the temperature readings
+     * to be 20 degrees for a certain number of timesteps.
+     **/
+    virtual void postString(std::string postArg) {
+        auto m = JSONCGIHandler::postDecoder(postArg);
+        float temp = atof(m["temperature"].c_str());
+        std::cerr << m["hello"] << "\n";
+        sensorfastcgi->forceTemperature(temp);
+    }
 
-	/**
-	 * Pointer to the handler which keeps the temperature
-	 **/
-	SENSORfastcgicallback* sensorfastcgi;
+    /**
+     * Pointer to the handler which keeps the temperature
+     **/
+    SENSORfastcgicallback* sensorfastcgi;
 };
-	
+
 
 // Main program
 int main(int argc, char *argv[]) {
-	// getting all the ADC related acquistion set up
-	FakeSensor* sensorcomm = new FakeSensor();
-	SENSORfastcgicallback sensorfastcgicallback;
-	sensorcomm->setCallback(&sensorfastcgicallback);
+    // getting all the ADC related acquistion set up
+    FakeSensor* sensorcomm = new FakeSensor();
+    SENSORfastcgicallback sensorfastcgicallback;
+    sensorcomm->setCallback(&sensorfastcgicallback);
 
-	// Setting up the JSONCGI communication
-	// The callback which is called when fastCGI needs data
-	// gets a pointer to the SENSOR callback class which
-	// contains the samples. Remember this is just a simple
-	// example to have access to some data.
-	JSONCGIADCCallback fastCGIADCCallback(&sensorfastcgicallback);
+    // Setting up the JSONCGI communication
+    // The callback which is called when fastCGI needs data
+    // gets a pointer to the SENSOR callback class which
+    // contains the samples. Remember this is just a simple
+    // example to have access to some data.
+    JSONCGIADCCallback fastCGIADCCallback(&sensorfastcgicallback);
 
-	// Callback handler for data which arrives from the the
-	// browser via jquery json post requests:
-	// $.post( 
-        //              "/sensor/:80",
-        //              {
-	//		  temperature: [20,18,19,20],
-	//                time: [171717,171718,171719,171720],
-	//                hello: "Hello, that's a test!"
-	//	      }
-	//	  );
-	SENSORPOSTCallback postCallback(&sensorfastcgicallback);
-	
-	// starting the fastCGI handler with the callback and the
-	// socket for nginx.
-	JSONCGIHandler* fastCGIHandler = new JSONCGIHandler(&fastCGIADCCallback,
-							    &postCallback,
-							    "/tmp/sensorsocket");
+    // Callback handler for data which arrives from the the
+    // browser via jquery json post requests:
+    // $.post(
+    //              "/sensor/:80",
+    //              {
+    //		  temperature: [20,18,19,20],
+    //                time: [171717,171718,171719,171720],
+    //                hello: "Hello, that's a test!"
+    //	      }
+    //	  );
+    SENSORPOSTCallback postCallback(&sensorfastcgicallback);
 
-	// starting the data acquisition at the given sampling rate
-	sensorcomm->startSensor();
+    // starting the fastCGI handler with the callback and the
+    // socket for nginx.
+    JSONCGIHandler* fastCGIHandler = new JSONCGIHandler(&fastCGIADCCallback,
+                                                        &postCallback,
+                                                        "/tmp/sensorsocket");
 
-	// catching Ctrl-C or kill -HUP so that we can terminate properly
-	setHUPHandler();
+    // starting the data acquisition at the given sampling rate
+    sensorcomm->startSensor();
 
-	fprintf(stderr,"'%s' up and running.\n",argv[0]);
+    // catching Ctrl-C or kill -HUP so that we can terminate properly
+    setHUPHandler();
 
-	// Just do nothing here and sleep. It's all dealt with in threads!
-	// At this point for example a GUI could be started such as QT
-	// Here, we just wait till the user presses ctrl-c which then
-	// sets mainRunning to zero.
-	while (mainRunning) sleep(1);
+    fprintf(stderr,"'%s' up and running.\n",argv[0]);
 
-	fprintf(stderr,"'%s' shutting down.\n",argv[0]);
+    // Just do nothing here and sleep. It's all dealt with in threads!
+    // At this point for example a GUI could be started such as QT
+    // Here, we just wait till the user presses ctrl-c which then
+    // sets mainRunning to zero.
+    while (mainRunning) sleep(1);
 
-	// stopping ADC
-	delete sensorcomm;
+    fprintf(stderr,"'%s' shutting down.\n",argv[0]);
 
-	// stops the fast CGI handlder
-	delete fastCGIHandler;
-	
-	return 0;
-};
+    // stopping ADC
+    delete sensorcomm;
+
+    // stops the fast CGI handlder
+    delete fastCGIHandler;
+
+    return 0;
+}
