@@ -31,11 +31,8 @@
 	  // get/post:
 	  var serverPath = "/sensor/:80";
 
-	  
 	  // callback when the Web page has been loaded
 	  $(document).ready(function() {
-		  console.log("start!!!!!!!!!!")
-		  alert("aaaaaa")
 	      var data = [];
 	      var g = new Dygraph(document.getElementById("div_g"), data,
 				  {
@@ -73,7 +70,7 @@
 			  var imageD = result.mat;
 			  var path = "data:image/jpg;base64,"+imageD;
 
-			  $("#imageBase").append('< img src="'+path+'"/>');
+			  $("#imageBase").html('< img src="'+path+'"/>');
 
 		  });
 	      }, 1000);
