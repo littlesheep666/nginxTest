@@ -24,7 +24,7 @@ public:
     virtual void hasSample(int sample) = 0;
 
     //
-    virtual void hasSampleCV(cv::Mat sample) = 0;
+//    virtual void hasSampleCV(cv::Mat sample) = 0;
 };
 
 
@@ -75,20 +75,20 @@ public:
         }
     }
 
-    void timerEventCV() {
-        cv::Mat image = cv::imread("/Users/littlesheep/Downloads/test1_result.jpg");  //存放自己图像的路径
-        //imshow("显示图像", image);
-        std::vector<unsigned char> data_encode;
-        int res = imencode(".jpg", image, data_encode);
-        std::string str_encode(data_encode.begin(), data_encode.end());
-        const char* c = str_encode.c_str();
-        JSONCGIHandler::JSONGenerator jsonGenerator;
-        jsonGenerator.add("mat",base64_encode(c, str_encode.size()));
-
-        return 0;
-
-
-    }
+//    void timerEventCV() {
+//        cv::Mat image = cv::imread("/Users/littlesheep/Downloads/test1_result.jpg");  //存放自己图像的路径
+//        //imshow("显示图像", image);
+//        std::vector<unsigned char> data_encode;
+//        int res = imencode(".jpg", image, data_encode);
+//        std::string str_encode(data_encode.begin(), data_encode.end());
+//        const char* c = str_encode.c_str();
+//        JSONCGIHandler::JSONGenerator jsonGenerator;
+//        jsonGenerator.add("mat",base64_encode(c, str_encode.size()));
+//
+//        return 0;
+//
+//
+//    }
 
 private:
 	SensorCallback* sensorCallback = nullptr;
