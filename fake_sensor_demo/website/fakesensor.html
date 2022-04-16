@@ -55,6 +55,7 @@
 		  // callback for interval timer for every second
 		  $.getJSON(serverPath,function(result){
                       data = [];
+			  console.log("result:",result);
 		      y = result.temperature[0];
                       document.getElementById("temperature").innerHTML = Math.round(y * 100) / 100;
                       for(let i = 0; i < result.time.length; i++) {
@@ -64,6 +65,8 @@
 			  data.push([d, y]);
 		      }
 		      g.updateOptions( { 'file': data } );
+
+
 		  });
 	      }, 1000);
 	  });
@@ -99,6 +102,8 @@
 <br />
 <br />
 <br />
+	  <img
+			  src=“data:image/jpg;base64,VKqcha68iIePB86GAiOv8CDADlIUQBs7MD3wAAAABJRU5ErkJggg%3D%3D”/>
 
 <p><a href="textonly.html">Text only version</a></p>
 	
