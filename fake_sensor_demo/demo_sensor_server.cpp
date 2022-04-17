@@ -166,7 +166,7 @@ public:
         auto m = JSONCGIHandler::postDecoder(postArg);
         float temp = atof(m["temperature"].c_str());
         std::cerr << m["hello"] << "\n";
-        sensorfastcgi->forceTemperature(temp);
+//        sensorfastcgi->forceTemperature(temp);
     }
 
     /**
