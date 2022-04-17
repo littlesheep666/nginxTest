@@ -27,13 +27,13 @@ public:
  * This class reads data from a fake sensor in the background
  * and calls a callback function whenever data is available.
  **/
-class FakeSensor : public CppTimer {
+class CVImage : public CppTimer {
 
 public:
-    FakeSensor() {
+    CVImage() {
     }
 
-    ~FakeSensor() {
+    ~CVImage() {
         stop();
     }
 
