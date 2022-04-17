@@ -73,16 +73,16 @@ public:
      * convert the raw ADC data to temperature
      * and store it in a variable.
      **/
-    virtual void hasSample(int v) {
-        temperatureBuffer.push_back(v);
-        if (temperatureBuffer.size() > maxBufSize) temperatureBuffer.pop_front();
-//         timestamp
-        t = getTimeMS();
-        timeBuffer.push_back(t);
-        if (timeBuffer.size() > maxBufSize) timeBuffer.pop_front();
+    virtual void hasSample(cv::Mat image) {
+//        temperatureBuffer.push_back(v);
+//        if (temperatureBuffer.size() > maxBufSize) temperatureBuffer.pop_front();
+//         //timestamp
+//        t = getTimeMS();
+//        timeBuffer.push_back(t);
+//        if (timeBuffer.size() > maxBufSize) timeBuffer.pop_front();
 
 
-        cv::Mat image = cv::imread("test1_result.jpg" );
+        //cv::Mat image = cv::imread("test1_result.jpg" );
         std::vector<unsigned char> data_encode;
         int res = imencode(".jpg", image, data_encode);
         std::string str_encode(data_encode.begin(), data_encode.end());
@@ -90,11 +90,11 @@ public:
         cvimage = base64_encode(c, str_encode.size());
     }
 
-    void forceTemperature(float temp) {
-        for(auto& v:temperatureBuffer) {
-            v = temp;
-        }
-    }
+//    void forceTemperature(float temp) {
+//        for(auto& v:temperatureBuffer) {
+//            v = temp;
+//        }
+//    }
 
 private:
     static unsigned long getTimeMS() {
@@ -141,16 +141,6 @@ public:
 //        jsonGenerator.add("epoch",(long)time(NULL));
 //        jsonGenerator.add("temperature",sensorfastcgi->temperatureBuffer);
 //        jsonGenerator.add("time",sensorfastcgi->timeBuffer);
-
-//        cv::Mat image = cv::imread("test1_result.jpg" );  //存放自己图像的路径
-//        //imshow("显示图像", image);
-//        std::vector<unsigned char> data_encode;
-//        int res = imencode(".jpg", image, data_encode);
-//        std::string str_encode(data_encode.begin(), data_encode.end());
-//        const char* c = str_encode.c_str();
-//        jsonGenerator.add("mat",base64_encode(c, str_encode.size()));
-
-
         jsonGenerator.add("mat",sensorfastcgi->cvimage);
         return jsonGenerator.getJSON();
     }
@@ -174,7 +164,7 @@ public:
         auto m = JSONCGIHandler::postDecoder(postArg);
         float temp = atof(m["temperature"].c_str());
         std::cerr << m["hello"] << "\n";
-        sensorfastcgi->forceTemperature(temp);
+//        sensorfastcgi->forceTemperature(temp);
     }
 
     /**
