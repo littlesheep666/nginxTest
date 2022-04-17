@@ -100,15 +100,19 @@ private:
      * that would be probably a database class or a
      * controller keeping it all together.
      **/
-    SENSORfastcgicallback* sensorfastcgi;
+//    SENSORfastcgicallback* sensorfastcgi;
+    cv::Mat cvCgiImage;
 
 public:
     /**
      * Constructor: argument is the ADC callback handler
      * which keeps the data as a simple example.
      **/
-    JSONCGIADCCallback(SENSORfastcgicallback* argSENSORfastcgi) {
-        sensorfastcgi = argSENSORfastcgi;
+//    JSONCGIADCCallback(SENSORfastcgicallback* argSENSORfastcgi) {
+//        sensorfastcgi = argSENSORfastcgi;
+//    }
+    JSONCGIADCCallback(cv::Mat argImage) {
+        cvCgiImage = argImage;
     }
 
     /**
@@ -118,7 +122,13 @@ public:
      **/
     virtual std::string getJSONString() {
         JSONCGIHandler::JSONGenerator jsonGenerator;
-        jsonGenerator.add("mat",sensorfastcgi->cvimage);
+        std::vector<unsigned char> data_encode;
+        cv::Mat image = cvCgiImage;
+        int res = imencode(".jpg", image, data_encode);
+        std::string str_encode(data_encode.begin(), data_encode.end());
+        const char* c = str_encode.c_str();
+//        jsonGenerator.add("mat",sensorfastcgi->cvimage);
+        jsonGenerator.add("mat",base64_encode(c, str_encode.size()));
         return jsonGenerator.getJSON();
     }
 };
@@ -127,9 +137,9 @@ public:
 /**
  * Callback handler which receives the JSON from jQuery
  **/
-class SENSORPOSTCallback : public JSONCGIHandler::POSTCallback {
+class CVPOSTCallback : public JSONCGIHandler::POSTCallback {
 public:
-    SENSORPOSTCallback(SENSORfastcgicallback* argSENSORfastcgi) {
+    CVPOSTCallback(SENSORfastcgicallback* argSENSORfastcgi) {
         sensorfastcgi = argSENSORfastcgi;
     }
 
@@ -138,9 +148,7 @@ public:
      * to be 20 degrees for a certain number of timesteps.
      **/
     virtual void postString(std::string postArg) {
-        auto m = JSONCGIHandler::postDecoder(postArg);
-        float temp = atof(m["temperature"].c_str());
-        std::cerr << m["hello"] << "\n";
+
     }
 
     /**
@@ -153,19 +161,20 @@ public:
 // Main program
 int main(int argc, char *argv[]) {
     // getting all the ADC related acquistion set up
-    CVImage* sensorcomm = new CVImage();
-    sensorcomm->setCVImage(cv::imread("test1_result.jpg" ));
+//    CVImage* sensorcomm = new CVImage();
+    cv::Mat CVImage = cv::imread("test1_result.jpg" );
     SENSORfastcgicallback sensorfastcgicallback;
-    sensorcomm->setCallback(&sensorfastcgicallback);
+//    sensorcomm->setCallback(&sensorfastcgicallback);
 
     // Setting up the JSONCGI communication
     // The callback which is called when fastCGI needs data
     // gets a pointer to the SENSOR callback class which
     // contains the samples. Remember this is just a simple
     // example to have access to some data.
-    JSONCGIADCCallback fastCGIADCCallback(&sensorfastcgicallback);
+//    JSONCGIADCCallback fastCGIADCCallback(&sensorfastcgicallback);
+    JSONCGIADCCallback fastCGIADCCallback(CVImage);
 
-    SENSORPOSTCallback postCallback(&sensorfastcgicallback);
+    CVPOSTCallback postCallback(&sensorfastcgicallback);
 
     // starting the fastCGI handler with the callback and the
     // socket for nginx.
@@ -174,7 +183,7 @@ int main(int argc, char *argv[]) {
                                                         "/tmp/sensorsocket");
 
     // starting the data acquisition at the given sampling rate
-    sensorcomm->startSensor();
+//    sensorcomm->startSensor();
 
     // catching Ctrl-C or kill -HUP so that we can terminate properly
     setHUPHandler();
@@ -190,7 +199,7 @@ int main(int argc, char *argv[]) {
     fprintf(stderr,"'%s' shutting down.\n",argv[0]);
 
     // stopping ADC
-    delete sensorcomm;
+//    delete sensorcomm;
 
     // stops the fast CGI handlder
     delete fastCGIHandler;
