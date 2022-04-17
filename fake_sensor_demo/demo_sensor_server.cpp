@@ -58,10 +58,11 @@ void setHUPHandler() {
  **/
 class SENSORfastcgicallback : public SensorCallback {
 public:
-    std::deque<float> temperatureBuffer;
-    std::deque<long> timeBuffer;
+//    std::deque<float> temperatureBuffer;
+//    std::deque<long> timeBuffer;
+//    std::deque<string> cvBuffer;
     long t;
-    const int maxBufSize = 50;
+//    const int maxBufSize = 50;
 
     /**
      * Callback with the fresh ADC data.
@@ -70,28 +71,31 @@ public:
      * convert the raw ADC data to temperature
      * and store it in a variable.
      **/
-    virtual void hasSample(int v) {
-        temperatureBuffer.push_back(v);
-        if (temperatureBuffer.size() > maxBufSize) temperatureBuffer.pop_front();
-        // timestamp
-        t = getTimeMS();
-        timeBuffer.push_back(t);
-        if (timeBuffer.size() > maxBufSize) timeBuffer.pop_front();
-    }
+//    virtual void hasSample(int v) {
+//        temperatureBuffer.push_back(v);
+//        if (temperatureBuffer.size() > maxBufSize) temperatureBuffer.pop_front();
+//         timestamp
+//        t = getTimeMS();
+//        timeBuffer.push_back(t);
+//        if (timeBuffer.size() > maxBufSize) timeBuffer.pop_front();
+//
+//        temperatureBuffer.push_back(v);
+//        if(cvBuffer.size()>maxBufSize) cvBuffer.pop_front();
+//    }
 
-    void forceTemperature(float temp) {
-        for(auto& v:temperatureBuffer) {
-            v = temp;
-        }
-    }
+//    void forceTemperature(float temp) {
+//        for(auto& v:temperatureBuffer) {
+//            v = temp;
+//        }
+//    }
 
-private:
-    static unsigned long getTimeMS() {
-        std::chrono::time_point<std::chrono::system_clock> now =
-                std::chrono::system_clock::now();
-        auto duration = now.time_since_epoch();
-        return (unsigned long)std::chrono::duration_cast<std::chrono::milliseconds>(duration).count();
-    }
+//private:
+//    static unsigned long getTimeMS() {
+//        std::chrono::time_point<std::chrono::system_clock> now =
+//                std::chrono::system_clock::now();
+//        auto duration = now.time_since_epoch();
+//        return (unsigned long)std::chrono::duration_cast<std::chrono::milliseconds>(duration).count();
+//    }
 };
 
 
@@ -127,10 +131,11 @@ public:
      **/
     virtual std::string getJSONString() {
         JSONCGIHandler::JSONGenerator jsonGenerator;
-        jsonGenerator.add("epoch",(long)time(NULL));
-        jsonGenerator.add("temperature",sensorfastcgi->temperatureBuffer);
-        jsonGenerator.add("time",sensorfastcgi->timeBuffer);
-
+//        jsonGenerator.add("epoch",(long)time(NULL));
+//        jsonGenerator.add("temperature",sensorfastcgi->temperatureBuffer);
+//        jsonGenerator.add("time",sensorfastcgi->timeBuffer);
+//
+//        jsonGenerator.add("mat",sensorfastcgi->cvBuffer);
 
         cv::Mat image = cv::imread("test1_result.jpg" );  //存放自己图像的路径
         //imshow("显示图像", image);
@@ -185,16 +190,6 @@ int main(int argc, char *argv[]) {
     // example to have access to some data.
     JSONCGIADCCallback fastCGIADCCallback(&sensorfastcgicallback);
 
-    // Callback handler for data which arrives from the the
-    // browser via jquery json post requests:
-    // $.post(
-    //              "/sensor/:80",
-    //              {
-    //		  temperature: [20,18,19,20],
-    //                time: [171717,171718,171719,171720],
-    //                hello: "Hello, that's a test!"
-    //	      }
-    //	  );
     SENSORPOSTCallback postCallback(&sensorfastcgicallback);
 
     // starting the fastCGI handler with the callback and the

@@ -67,13 +67,13 @@ public:
 	/**
 	 * Fake the arrival of data
 	 **/
-    void timerEvent() {
-        float value = sin(t) * 5 + 20;
-        t += 0.1;
-        if (nullptr != sensorCallback) {
-            sensorCallback->hasSample(value);
-        }
-    }
+//    void timerEvent() {
+//        float value = sin(t) * 5 + 20;
+//        t += 0.1;
+//        if (nullptr != sensorCallback) {
+//            sensorCallback->hasSample(value);
+//        }
+//    }
 
 //    void timerEventCV() {
 //        cv::Mat image = cv::imread("/Users/littlesheep/Downloads/test1_result.jpg");  //存放自己图像的路径
