@@ -74,10 +74,10 @@ public:
     virtual void hasSample(int v) {
         temperatureBuffer.push_back(v);
         if (temperatureBuffer.size() > maxBufSize) temperatureBuffer.pop_front();
-        // timestamp
-//        t = getTimeMS();
-//        timeBuffer.push_back(t);
-//        if (timeBuffer.size() > maxBufSize) timeBuffer.pop_front();
+         timestamp
+        t = getTimeMS();
+        timeBuffer.push_back(t);
+        if (timeBuffer.size() > maxBufSize) timeBuffer.pop_front();
     }
 
     void forceTemperature(float temp) {
