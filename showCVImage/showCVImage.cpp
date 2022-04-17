@@ -7,50 +7,19 @@
  *
  */
 
-#include <string.h>
 #include <unistd.h>
-#include <math.h>
 #include "CppTimer.h"
 #include <opencv2/opencv.hpp>
 #include "json_fastcgi_web_api.h"
-//#include "showCVImage.h"
 #include "base64.h"
 
 /**
  * Flag to indicate that we are running.
  * Needed later to quit the idle loop.
  **/
-int mainRunning = 1;
-
-/**
- * Handler when the user has pressed ctrl-C
- * send HUP via the kill command.
- **/
-//void sigHandler(int sig) {
-//    if((sig == SIGHUP) || (sig == SIGINT)) {
-//        mainRunning = 0;
-//    }
-//}
+//int mainRunning = 1;
 
 
-/**
- * Sets a signal handler so that you can kill
- * the background process gracefully with:
- * kill -HUP <PID>
- **/
-//void setHUPHandler() {
-//    struct sigaction act;
-//    memset (&act, 0, sizeof (act));
-//    act.sa_handler = sigHandler;
-//    if (sigaction (SIGHUP, &act, NULL) < 0) {
-//        perror ("sigaction");
-//        exit (-1);
-//    }
-//    if (sigaction (SIGINT, &act, NULL) < 0) {
-//        perror ("sigaction");
-//        exit (-1);
-//    }
-//}
 
 /**
  * Callback handler which returns data to the
@@ -104,12 +73,8 @@ public:
     /**
      * receives the JSON from jQuery.
      **/
-    virtual void postString(std::string postArg) {
-
-    }
-
+    virtual void postString(std::string postArg) {}
 };
-
 
 // Main program
 int main(int argc, char *argv[]) {
@@ -138,7 +103,7 @@ int main(int argc, char *argv[]) {
     // At this point for example a GUI could be started such as QT
     // Here, we just wait till the user presses ctrl-c which then
     // sets mainRunning to zero.
-    while (mainRunning) sleep(1);
+//    while (mainRunning) sleep(1);
 
     fprintf(stderr,"'%s' shutting down.\n",argv[0]);
 
