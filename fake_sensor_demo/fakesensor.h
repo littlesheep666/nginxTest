@@ -67,7 +67,6 @@ public:
         t += 0.1;
         if (nullptr != sensorCallback) {
             sensorCallback->hasSample(value);
-            sensorCallback->hasSampleCV(image);
         }
     }
 
