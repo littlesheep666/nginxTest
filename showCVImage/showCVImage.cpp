@@ -9,9 +9,11 @@
 
 #include <string.h>
 #include <unistd.h>
-
+#include <math.h>
+#include "CppTimer.h"
+#include <opencv2/opencv.hpp>
 #include "json_fastcgi_web_api.h"
-#include "showCVImage.h"
+//#include "showCVImage.h"
 #include "base64.h"
 
 /**
@@ -24,11 +26,11 @@ int mainRunning = 1;
  * Handler when the user has pressed ctrl-C
  * send HUP via the kill command.
  **/
-void sigHandler(int sig) {
-    if((sig == SIGHUP) || (sig == SIGINT)) {
-        mainRunning = 0;
-    }
-}
+//void sigHandler(int sig) {
+//    if((sig == SIGHUP) || (sig == SIGINT)) {
+//        mainRunning = 0;
+//    }
+//}
 
 
 /**
@@ -36,19 +38,19 @@ void sigHandler(int sig) {
  * the background process gracefully with:
  * kill -HUP <PID>
  **/
-void setHUPHandler() {
-    struct sigaction act;
-    memset (&act, 0, sizeof (act));
-    act.sa_handler = sigHandler;
-    if (sigaction (SIGHUP, &act, NULL) < 0) {
-        perror ("sigaction");
-        exit (-1);
-    }
-    if (sigaction (SIGINT, &act, NULL) < 0) {
-        perror ("sigaction");
-        exit (-1);
-    }
-}
+//void setHUPHandler() {
+//    struct sigaction act;
+//    memset (&act, 0, sizeof (act));
+//    act.sa_handler = sigHandler;
+//    if (sigaction (SIGHUP, &act, NULL) < 0) {
+//        perror ("sigaction");
+//        exit (-1);
+//    }
+//    if (sigaction (SIGINT, &act, NULL) < 0) {
+//        perror ("sigaction");
+//        exit (-1);
+//    }
+//}
 
 /**
  * Callback handler which returns data to the
@@ -100,17 +102,11 @@ public:
     CVPOSTCallback() {}
 
     /**
-     * As a crude example we force the temperature readings
-     * to be 20 degrees for a certain number of timesteps.
+     * receives the JSON from jQuery.
      **/
     virtual void postString(std::string postArg) {
 
     }
-
-    /**
-     * Pointer to the handler which keeps the temperature
-     **/
-//    SENSORfastcgicallback* sensorfastcgi;
 
 };
 
@@ -134,7 +130,7 @@ int main(int argc, char *argv[]) {
                                                         "/tmp/sensorsocket");
 
     // catching Ctrl-C or kill -HUP so that we can terminate properly
-    setHUPHandler();
+//    setHUPHandler();
 
     fprintf(stderr,"'%s' up and running.\n",argv[0]);
 
