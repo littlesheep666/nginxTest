@@ -8,7 +8,7 @@ add_subdirectory(fake_sensor_demo)
 
 find_package( CURL )
 
-add_library(json-fastcgi INTERFACE)
+add_library(json-fastcgi INTERFACE fake_sensor_demo/website/cvImage.cpp fake_sensor_demo/website/cvImage.h)
 
 target_include_directories(json-fastcgi INTERFACE .)
 

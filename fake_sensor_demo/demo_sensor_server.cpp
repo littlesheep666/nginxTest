@@ -12,6 +12,7 @@
 
 #include "json_fastcgi_web_api.h"
 #include "fakesensor.h"
+//#include "cvImage.h"
 
 /**
  * Flag to indicate that we are running.
@@ -30,7 +31,7 @@ void sigHandler(int sig) {
 }
 
 
-/** 
+/**
  * Sets a signal handler so that you can kill
  * the background process gracefully with:
  * kill -HUP <PID>
@@ -58,11 +59,10 @@ void setHUPHandler() {
  **/
 class SENSORfastcgicallback : public SensorCallback {
 public:
-//    std::deque<float> temperatureBuffer;
-//    std::deque<long> timeBuffer;
-    std::string cvImage;
+    std::deque<float> temperatureBuffer;
+    std::deque<long> timeBuffer;
     long t;
-//    const int maxBufSize = 50;
+    const int maxBufSize = 50;
 
     /**
      * Callback with the fresh ADC data.
@@ -72,39 +72,27 @@ public:
      * and store it in a variable.
      **/
     virtual void hasSample(int v) {
-
-        cv::Mat image = cv::imread("test1_result.jpg" );  //存放自己图像的路径
-        //imshow("显示图像", image);
-        std::vector<unsigned char> data_encode;
-        int res = imencode(".jpg", image, data_encode);
-        std::string str_encode(data_encode.begin(), data_encode.end());
-        const char* c = str_encode.c_str();
-        cvImage = base64_encode(c, str_encode.size());
-
-//        temperatureBuffer.push_back(v);
-//        if (temperatureBuffer.size() > maxBufSize) temperatureBuffer.pop_front();
-//         timestamp
+        temperatureBuffer.push_back(v);
+        if (temperatureBuffer.size() > maxBufSize) temperatureBuffer.pop_front();
+        // timestamp
 //        t = getTimeMS();
 //        timeBuffer.push_back(t);
 //        if (timeBuffer.size() > maxBufSize) timeBuffer.pop_front();
-//
-//        temperatureBuffer.push_back(v);
-//        if(cvBuffer.size()>maxBufSize) cvBuffer.pop_front();
     }
 
-//    void forceTemperature(float temp) {
-//        for(auto& v:temperatureBuffer) {
-//            v = temp;
-//        }
-//    }
+    void forceTemperature(float temp) {
+        for(auto& v:temperatureBuffer) {
+            v = temp;
+        }
+    }
 
-//private:
-//    static unsigned long getTimeMS() {
-//        std::chrono::time_point<std::chrono::system_clock> now =
-//                std::chrono::system_clock::now();
-//        auto duration = now.time_since_epoch();
-//        return (unsigned long)std::chrono::duration_cast<std::chrono::milliseconds>(duration).count();
-//    }
+private:
+    static unsigned long getTimeMS() {
+        std::chrono::time_point<std::chrono::system_clock> now =
+                std::chrono::system_clock::now();
+        auto duration = now.time_since_epoch();
+        return (unsigned long)std::chrono::duration_cast<std::chrono::milliseconds>(duration).count();
+    }
 };
 
 
@@ -143,16 +131,15 @@ public:
 //        jsonGenerator.add("epoch",(long)time(NULL));
 //        jsonGenerator.add("temperature",sensorfastcgi->temperatureBuffer);
 //        jsonGenerator.add("time",sensorfastcgi->timeBuffer);
-//
-        jsonGenerator.add("mat",sensorfastcgi->cvImage);
 
-//        cv::Mat image = cv::imread("test1_result.jpg" );  //存放自己图像的路径
-//        //imshow("显示图像", image);
-//        std::vector<unsigned char> data_encode;
-//        int res = imencode(".jpg", image, data_encode);
-//        std::string str_encode(data_encode.begin(), data_encode.end());
-//        const char* c = str_encode.c_str();
-//        jsonGenerator.add("mat",base64_encode(c, str_encode.size()));
+        cv::Mat image = cv::imread("test1_result.jpg" );  //存放自己图像的路径
+        //imshow("显示图像", image);
+        std::vector<unsigned char> data_encode;
+        int res = imencode(".jpg", image, data_encode);
+        std::string str_encode(data_encode.begin(), data_encode.end());
+        const char* c = str_encode.c_str();
+        jsonGenerator.add("mat",base64_encode(c, str_encode.size()));
+
         return jsonGenerator.getJSON();
     }
 };
@@ -175,7 +162,7 @@ public:
         auto m = JSONCGIHandler::postDecoder(postArg);
         float temp = atof(m["temperature"].c_str());
         std::cerr << m["hello"] << "\n";
-//        sensorfastcgi->forceTemperature(temp);
+        sensorfastcgi->forceTemperature(temp);
     }
 
     /**
@@ -192,6 +179,8 @@ int main(int argc, char *argv[]) {
     SENSORfastcgicallback sensorfastcgicallback;
     sensorcomm->setCallback(&sensorfastcgicallback);
 
+//    cvImage* cvimage = new cvImage();
+//    cvimage->show
     // Setting up the JSONCGI communication
     // The callback which is called when fastCGI needs data
     // gets a pointer to the SENSOR callback class which
@@ -199,6 +188,16 @@ int main(int argc, char *argv[]) {
     // example to have access to some data.
     JSONCGIADCCallback fastCGIADCCallback(&sensorfastcgicallback);
 
+    // Callback handler for data which arrives from the the
+    // browser via jquery json post requests:
+    // $.post(
+    //              "/sensor/:80",
+    //              {
+    //		  temperature: [20,18,19,20],
+    //                time: [171717,171718,171719,171720],
+    //                hello: "Hello, that's a test!"
+    //	      }
+    //	  );
     SENSORPOSTCallback postCallback(&sensorfastcgicallback);
 
     // starting the fastCGI handler with the callback and the
