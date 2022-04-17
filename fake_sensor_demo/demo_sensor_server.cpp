@@ -62,7 +62,7 @@ class SENSORfastcgicallback : public SensorCallback {
 public:
     std::deque<float> temperatureBuffer;
     std::deque<long> timeBuffer;
-    std::string image;
+    std::string cvimage;
     long t;
     const int maxBufSize = 50;
 
@@ -82,12 +82,12 @@ public:
         if (timeBuffer.size() > maxBufSize) timeBuffer.pop_front();
 
 
-        cv::Mat cvImage = cv::imread("test1_result.jpg" );
+        cv::Mat image = cv::imread("test1_result.jpg" );
         std::vector<unsigned char> data_encode;
         int res = imencode(".jpg", image, data_encode);
         std::string str_encode(data_encode.begin(), data_encode.end());
         const char* c = str_encode.c_str();
-        image = base64_encode(c, str_encode.size());
+        cvimage = base64_encode(c, str_encode.size());
     }
 
     void forceTemperature(float temp) {
@@ -151,7 +151,7 @@ public:
 //        jsonGenerator.add("mat",base64_encode(c, str_encode.size()));
 
 
-        jsonGenerator.add("mat",sensorfastcgi->image);
+        jsonGenerator.add("mat",sensorfastcgi->cvimage);
         return jsonGenerator.getJSON();
     }
 };
