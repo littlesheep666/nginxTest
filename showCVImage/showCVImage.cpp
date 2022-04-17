@@ -123,6 +123,7 @@ public:
     virtual std::string getJSONString() {
         JSONCGIHandler::JSONGenerator jsonGenerator;
         std::vector<unsigned char> data_encode;
+
         cv::Mat image = cvCgiImage;
         int res = imencode(".jpg", image, data_encode);
         std::string str_encode(data_encode.begin(), data_encode.end());
@@ -167,6 +168,7 @@ int main(int argc, char *argv[]) {
 //    sensorcomm->setCallback(&sensorfastcgicallback);
 
     // Setting up the JSONCGI communication
+
     // The callback which is called when fastCGI needs data
     // gets a pointer to the SENSOR callback class which
     // contains the samples. Remember this is just a simple
