@@ -65,14 +65,23 @@ public:
     void timerEvent() {
         float value = sin(t) * 5 + 20;
         t += 0.1;
+        setCVImage(cv::imread("test1_result.jpg" ));
         if (nullptr != sensorCallback) {
             sensorCallback->hasSample(getCVImage());
         }
     }
 
+//    cv::Mat getCVImage(){
+//        cv::Mat cvimage = cv::imread("test1_result.jpg" );
+//        return cvimage;
+//    }
+
     cv::Mat getCVImage(){
-        cvimage = cv::imread("test1_result.jpg" );
-        return cvimage;
+        return this.cvimage;
+    }
+
+    void setCVImage(cv::Mat image){
+        this.cvimage = image;
     }
 
 private:
