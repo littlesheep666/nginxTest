@@ -60,7 +60,7 @@ class SENSORfastcgicallback : public SensorCallback {
 public:
 //    std::deque<float> temperatureBuffer;
 //    std::deque<long> timeBuffer;
-//    std::deque<string> cvBuffer;
+    std::string cvImage;
     long t;
 //    const int maxBufSize = 50;
 
@@ -71,7 +71,16 @@ public:
      * convert the raw ADC data to temperature
      * and store it in a variable.
      **/
-//    virtual void hasSample(int v) {
+    virtual void hasSample(int v) {
+        cvImage
+        cv::Mat image = cv::imread("test1_result.jpg" );  //存放自己图像的路径
+        //imshow("显示图像", image);
+        std::vector<unsigned char> data_encode;
+        int res = imencode(".jpg", image, data_encode);
+        std::string str_encode(data_encode.begin(), data_encode.end());
+        const char* c = str_encode.c_str();
+        cvImage = base64_encode(c, str_encode.size());
+
 //        temperatureBuffer.push_back(v);
 //        if (temperatureBuffer.size() > maxBufSize) temperatureBuffer.pop_front();
 //         timestamp
@@ -81,7 +90,7 @@ public:
 //
 //        temperatureBuffer.push_back(v);
 //        if(cvBuffer.size()>maxBufSize) cvBuffer.pop_front();
-//    }
+    }
 
 //    void forceTemperature(float temp) {
 //        for(auto& v:temperatureBuffer) {
@@ -135,15 +144,15 @@ public:
 //        jsonGenerator.add("temperature",sensorfastcgi->temperatureBuffer);
 //        jsonGenerator.add("time",sensorfastcgi->timeBuffer);
 //
-//        jsonGenerator.add("mat",sensorfastcgi->cvBuffer);
+        jsonGenerator.add("mat",sensorfastcgi->cvImage);
 
-        cv::Mat image = cv::imread("test1_result.jpg" );  //存放自己图像的路径
-        //imshow("显示图像", image);
-        std::vector<unsigned char> data_encode;
-        int res = imencode(".jpg", image, data_encode);
-        std::string str_encode(data_encode.begin(), data_encode.end());
-        const char* c = str_encode.c_str();
-        jsonGenerator.add("mat",base64_encode(c, str_encode.size()));
+//        cv::Mat image = cv::imread("test1_result.jpg" );  //存放自己图像的路径
+//        //imshow("显示图像", image);
+//        std::vector<unsigned char> data_encode;
+//        int res = imencode(".jpg", image, data_encode);
+//        std::string str_encode(data_encode.begin(), data_encode.end());
+//        const char* c = str_encode.c_str();
+//        jsonGenerator.add("mat",base64_encode(c, str_encode.size()));
         return jsonGenerator.getJSON();
     }
 };

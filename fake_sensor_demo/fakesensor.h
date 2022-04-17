@@ -32,7 +32,7 @@ public:
  * This class reads data from a fake sensor in the background
  * and calls a callback function whenever data is available.
  **/
-class FakeSensor : public CppTimer {
+class FakeSensor  {
 
 public:
 	FakeSensor() {
