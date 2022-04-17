@@ -12,6 +12,7 @@
 
 #include "json_fastcgi_web_api.h"
 #include "fakesensor.h"
+#include "base64.h"
 //#include "cvImage.h"
 
 /**
