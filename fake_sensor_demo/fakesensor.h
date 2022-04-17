@@ -53,16 +53,16 @@ public:
 	 * Starts the data acquisition in the background and the
 	 * callback is called with new samples
 	 **/
-	void startSensor() {
-		start(250000000);
-	}
+//	void startSensor() {
+//		start(250000000);
+//	}
 
 	/**
 	 * Stops the data acquistion
 	 **/
-	void stopSensor() {
-		stop();
-	}
+//	void stopSensor() {
+//		stop();
+	/}
 
 	/**
 	 * Fake the arrival of data
