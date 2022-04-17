@@ -19,8 +19,6 @@
  **/
 int mainRunning = 1;
 
-
-
 /**
  * Callback handler which returns data to the
  * nginx server. Here, simply the current temperature
@@ -79,13 +77,10 @@ public:
 // Main program
 int main(int argc, char *argv[]) {
     cv::Mat CVImage = cv::imread("test1_result.jpg" );
-
     // Setting up the JSONCGI communication
-
     // The callback which is called when fastCGI needs data
     // gets a pointer to the cvImage callback class.
     JSONCGIADCCallback fastCGIADCCallback(CVImage);
-
     CVPOSTCallback postCallback;
 
     // starting the fastCGI handler with the callback and the
@@ -93,10 +88,6 @@ int main(int argc, char *argv[]) {
     JSONCGIHandler* fastCGIHandler = new JSONCGIHandler(&fastCGIADCCallback,
                                                         &postCallback,
                                                         "/tmp/sensorsocket");
-
-    // catching Ctrl-C or kill -HUP so that we can terminate properly
-//    setHUPHandler();
-
     fprintf(stderr,"'%s' up and running.\n",argv[0]);
 
     // Just do nothing here and sleep. It's all dealt with in threads!
@@ -104,11 +95,8 @@ int main(int argc, char *argv[]) {
     // Here, we just wait till the user presses ctrl-c which then
     // sets mainRunning to zero.
     while (mainRunning) sleep(1);
-
     fprintf(stderr,"'%s' shutting down.\n",argv[0]);
-
     // stops the fast CGI handlder
     delete fastCGIHandler;
-
     return 0;
 }
