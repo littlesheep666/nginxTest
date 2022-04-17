@@ -178,6 +178,7 @@ public:
 int main(int argc, char *argv[]) {
     // getting all the ADC related acquistion set up
     FakeSensor* sensorcomm = new FakeSensor();
+    sensorcomm->setCVImage(cv::imread("test1_result.jpg" ));
     SENSORfastcgicallback sensorfastcgicallback;
     sensorcomm->setCallback(&sensorfastcgicallback);
 
