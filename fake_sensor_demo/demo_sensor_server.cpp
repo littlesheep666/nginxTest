@@ -72,7 +72,7 @@ public:
      * and store it in a variable.
      **/
     virtual void hasSample(int v) {
-        cvImage
+
         cv::Mat image = cv::imread("test1_result.jpg" );  //存放自己图像的路径
         //imshow("显示图像", image);
         std::vector<unsigned char> data_encode;
