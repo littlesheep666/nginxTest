@@ -77,11 +77,11 @@ public:
 //    }
 
     cv::Mat getCVImage(){
-        return this.cvimage;
+        return cvimage;
     }
 
     void setCVImage(cv::Mat image){
-        this.cvimage = image;
+        cvimage = image;
     }
 
 private:
