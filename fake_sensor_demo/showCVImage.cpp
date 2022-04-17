@@ -60,7 +60,6 @@ void setHUPHandler() {
 class SENSORfastcgicallback : public SensorCallback {
 public:
     std::string cvimage;
-    long t;
 
     /**
      * Callback with the fresh ADC data.

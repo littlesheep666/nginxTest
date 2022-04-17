@@ -63,9 +63,6 @@ public:
      * Fake the arrival of data
      **/
     void timerEvent() {
-        float value = sin(t) * 5 + 20;
-        t += 0.1;
-//        setCVImage(cv::imread("test1_result.jpg" ));
         if (nullptr != sensorCallback) {
             sensorCallback->hasSample(getCVImage());
         }
@@ -81,7 +78,6 @@ public:
 
 private:
     SensorCallback* sensorCallback = nullptr;
-    float t = 0;
     cv::Mat cvimage;
 };
 
