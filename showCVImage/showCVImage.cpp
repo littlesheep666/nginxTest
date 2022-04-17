@@ -17,7 +17,7 @@
  * Flag to indicate that we are running.
  * Needed later to quit the idle loop.
  **/
-//int mainRunning = 1;
+int mainRunning = 1;
 
 
 
@@ -103,7 +103,7 @@ int main(int argc, char *argv[]) {
     // At this point for example a GUI could be started such as QT
     // Here, we just wait till the user presses ctrl-c which then
     // sets mainRunning to zero.
-//    while (mainRunning) sleep(1);
+    while (mainRunning) sleep(1);
 
     fprintf(stderr,"'%s' shutting down.\n",argv[0]);
 
