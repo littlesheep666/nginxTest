@@ -50,42 +50,6 @@ void setHUPHandler() {
     }
 }
 
-
-/**
- * Handler which receives the data here just saves
- * the most recent sample with timestamp. Obviously,
- * in a real application the data would be stored
- * in a database and/or triggers events and other things!
- **/
-class SENSORfastcgicallback : public SensorCallback {
-public:
-    std::string cvimage;
-
-    /**
-     * Callback with the fresh ADC data.
-     * That's where all the internal processing
-     * of the data is happening. Here, we just
-     * convert the raw ADC data to temperature
-     * and store it in a variable.
-     **/
-    virtual void hasSample(cv::Mat image) {
-        std::vector<unsigned char> data_encode;
-        int res = imencode(".jpg", image, data_encode);
-        std::string str_encode(data_encode.begin(), data_encode.end());
-        const char* c = str_encode.c_str();
-        cvimage = base64_encode(c, str_encode.size());
-    }
-
-private:
-    static unsigned long getTimeMS() {
-        std::chrono::time_point<std::chrono::system_clock> now =
-                std::chrono::system_clock::now();
-        auto duration = now.time_since_epoch();
-        return (unsigned long)std::chrono::duration_cast<std::chrono::milliseconds>(duration).count();
-    }
-};
-
-
 /**
  * Callback handler which returns data to the
  * nginx server. Here, simply the current temperature
@@ -100,35 +64,28 @@ private:
      * that would be probably a database class or a
      * controller keeping it all together.
      **/
-//    SENSORfastcgicallback* sensorfastcgi;
     cv::Mat cvCgiImage;
 
 public:
     /**
-     * Constructor: argument is the ADC callback handler
+     * Constructor: argument is the cvImage callback handler
      * which keeps the data as a simple example.
      **/
-//    JSONCGIADCCallback(SENSORfastcgicallback* argSENSORfastcgi) {
-//        sensorfastcgi = argSENSORfastcgi;
-//    }
     JSONCGIADCCallback(cv::Mat argImage) {
         cvCgiImage = argImage;
     }
 
     /**
      * Gets the data sends it to the webserver.
-     * The callback creates two json entries. One with the
-     * timestamp and one with the temperature from the sensor.
+     * The callback creates two json entries.
      **/
     virtual std::string getJSONString() {
         JSONCGIHandler::JSONGenerator jsonGenerator;
         std::vector<unsigned char> data_encode;
-
         cv::Mat image = cvCgiImage;
         int res = imencode(".jpg", image, data_encode);
         std::string str_encode(data_encode.begin(), data_encode.end());
         const char* c = str_encode.c_str();
-//        jsonGenerator.add("mat",sensorfastcgi->cvimage);
         jsonGenerator.add("mat",base64_encode(c, str_encode.size()));
         return jsonGenerator.getJSON();
     }
@@ -140,9 +97,7 @@ public:
  **/
 class CVPOSTCallback : public JSONCGIHandler::POSTCallback {
 public:
-    CVPOSTCallback(SENSORfastcgicallback* argSENSORfastcgi) {
-        sensorfastcgi = argSENSORfastcgi;
-    }
+    CVPOSTCallback() {}
 
     /**
      * As a crude example we force the temperature readings
@@ -155,37 +110,28 @@ public:
     /**
      * Pointer to the handler which keeps the temperature
      **/
-    SENSORfastcgicallback* sensorfastcgi;
+//    SENSORfastcgicallback* sensorfastcgi;
+
 };
 
 
 // Main program
 int main(int argc, char *argv[]) {
-    // getting all the ADC related acquistion set up
-//    CVImage* sensorcomm = new CVImage();
     cv::Mat CVImage = cv::imread("test1_result.jpg" );
-    SENSORfastcgicallback sensorfastcgicallback;
-//    sensorcomm->setCallback(&sensorfastcgicallback);
 
     // Setting up the JSONCGI communication
 
     // The callback which is called when fastCGI needs data
-    // gets a pointer to the SENSOR callback class which
-    // contains the samples. Remember this is just a simple
-    // example to have access to some data.
-//    JSONCGIADCCallback fastCGIADCCallback(&sensorfastcgicallback);
+    // gets a pointer to the cvImage callback class.
     JSONCGIADCCallback fastCGIADCCallback(CVImage);
 
-    CVPOSTCallback postCallback(&sensorfastcgicallback);
+    CVPOSTCallback postCallback;
 
     // starting the fastCGI handler with the callback and the
     // socket for nginx.
     JSONCGIHandler* fastCGIHandler = new JSONCGIHandler(&fastCGIADCCallback,
                                                         &postCallback,
                                                         "/tmp/sensorsocket");
-
-    // starting the data acquisition at the given sampling rate
-//    sensorcomm->startSensor();
 
     // catching Ctrl-C or kill -HUP so that we can terminate properly
     setHUPHandler();
@@ -199,9 +145,6 @@ int main(int argc, char *argv[]) {
     while (mainRunning) sleep(1);
 
     fprintf(stderr,"'%s' shutting down.\n",argv[0]);
-
-    // stopping ADC
-//    delete sensorcomm;
 
     // stops the fast CGI handlder
     delete fastCGIHandler;
