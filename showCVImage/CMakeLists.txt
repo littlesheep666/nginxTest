@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.1.0)
-project (fake_sensor_demo)
+project (showCVImage)
 add_executable(demo_sensor_server showCVImage.cpp CppTimer.cpp )
 set (CMAKE_CXX_STANDARD 11)
 

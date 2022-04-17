@@ -1,4 +1,4 @@
-# Install script for directory: /Users/littlesheep/Downloads/json_fastcgi_web_api-main/fake_sensor_demo
+# Install script for directory: /Users/littlesheep/Downloads/json_fastcgi_web_api-main/showCVImage
 
 # Set the install prefix
 if(NOT DEFINED CMAKE_INSTALL_PREFIX)
